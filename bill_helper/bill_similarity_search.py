@@ -10,7 +10,7 @@ import pandas as pd
 from typing import Union, List
 
 # Own customized modules
-from .searcher import BillSearcher
+from bill_helper.searcher import BillSearcher
 
 # global variables needed
 searcher = BillSearcher()
@@ -20,7 +20,7 @@ def find_k_nearest_bills(query_texts: Union[str, List[str]], k: int = 5) -> List
     return searcher.find_k_nearest_bills(query_texts, k)
 
 
-def test():
+if __name__ == "__main__":
     query_texts = [
         "空心砖墙 1、砖品种、规格、强度等级：蒸压加气混凝土砌块 2、砂浆强度等级：M5水泥石灰砂浆 3、墙体厚度：200厚砖内墙 m3",  # id: 0
         "直形墙 1、C40普通商品混凝土20石 m3",  # id: 5
@@ -30,7 +30,3 @@ def test():
     ]
     k = 5
     ans = find_k_nearest_bills(query_texts, k)
-
-
-if __name__ == "__main__":
-    test()

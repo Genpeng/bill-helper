@@ -12,9 +12,9 @@ import string
 from zhon import hanzi
 
 # Own customized modules
-from .util import load_stopwords
-from .global_variables import (USERDICT_FILEPATH,
-                               STOPWORDS_FILEPATH)
+from bill_helper.util import load_stopwords
+from bill_helper.global_variables import (USERDICT_FILEPATH,
+                                          STOPWORDS_FILEPATH)
 
 
 class MyTokenizer(object):
@@ -47,11 +47,7 @@ class MyTokenizer(object):
         return ' '.join(words)
 
 
-def test():
+if __name__ == "__main__":
     text = "空心砖墙,1、砖品种、规格、强度等级：蒸压加气混凝土砌块 2、砂浆强度等级：M5水泥石灰砂浆 3、墙体厚度：200厚砖内墙,m3"
     tokenizer = MyTokenizer()
     print(tokenizer.segment(text))
-
-
-if __name__ == "__main__":
-    test()

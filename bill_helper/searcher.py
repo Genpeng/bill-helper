@@ -13,11 +13,11 @@ import pandas as pd
 from typing import Union, List, Tuple
 
 # Own customized variables
-from .tokenizer import MyTokenizer
-from .global_variables import (BILL_DATA_FILEPATH,
-                               DATABASE_VECTORS_FILEPATH,
-                               T2_VECTORIZER_FILEPATH,
-                               ORDINAL_2_ID_DICT_FILEPATH)
+from bill_helper.tokenizer import MyTokenizer
+from bill_helper.global_variables import (BILL_DATA_FILEPATH,
+                                          DATABASE_VECTORS_FILEPATH,
+                                          T2_VECTORIZER_FILEPATH,
+                                          ORDINAL_2_ID_DICT_FILEPATH)
 
 
 class BillSearcher(object):
@@ -94,7 +94,7 @@ class BillSearcher(object):
         return self._d
 
 
-def _test():
+if __name__ == "__main__":
     query_texts = [
         "空心砖墙 1、砖品种、规格、强度等级：蒸压加气混凝土砌块 2、砂浆强度等级：M5水泥石灰砂浆 3、墙体厚度：200厚砖内墙 m3",  # index 0
         "直形墙 1、C40普通商品混凝土20石 m3",  # index 5
@@ -104,7 +104,3 @@ def _test():
     searcher = BillSearcher()
     results = searcher.find_k_nearest_bills(query_texts, 5)
     print(results[0])
-
-
-if __name__ == "__main__":
-    _test()
