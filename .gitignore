@@ -134,7 +134,7 @@ dmypy.json
 # Pycharm ignore files
 .idea/
 
-# Project ignored files
+# Project ignore files
 data/
 data_backup/
 docs/
