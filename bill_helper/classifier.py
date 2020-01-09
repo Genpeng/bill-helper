@@ -10,10 +10,10 @@ import joblib
 from typing import Union, List
 
 # Own customized variables & modules
-from core.tokenizer import MyTokenizer
-from core.global_variables import (T1_VECTORIZER_FILEPATH,
-                                   T1_MODEL_FILEPATH,
-                                   LABEL_2_TYPE_DICT_FILEPATH)
+from .tokenizer import MyTokenizer
+from .global_variables import (T1_VECTORIZER_FILEPATH,
+                               T1_MODEL_FILEPATH,
+                               LABEL_2_TYPE_DICT_FILEPATH)
 
 
 class BillClassifier(object):

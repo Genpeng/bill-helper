@@ -10,7 +10,7 @@ import pandas as pd
 from typing import Union, List
 
 # Own customized modules
-from core.searcher import BillSearcher
+from .searcher import BillSearcher
 
 # global variables needed
 searcher = BillSearcher()

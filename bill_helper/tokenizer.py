@@ -12,9 +12,9 @@ import string
 from zhon import hanzi
 
 # Own customized modules
-from core.util import load_stopwords
-from core.global_variables import (USERDICT_FILEPATH,
-                                   STOPWORDS_FILEPATH)
+from .util import load_stopwords
+from .global_variables import (USERDICT_FILEPATH,
+                               STOPWORDS_FILEPATH)
 
 
 class MyTokenizer(object):

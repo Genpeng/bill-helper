@@ -13,11 +13,11 @@ import pandas as pd
 from typing import Union, List, Tuple
 
 # Own customized variables
-from core.tokenizer import MyTokenizer
-from core.global_variables import (BILL_DATA_FILEPATH,
-                                   DATABASE_VECTORS_FILEPATH,
-                                   T2_VECTORIZER_FILEPATH,
-                                   ORDINAL_2_ID_DICT_FILEPATH)
+from .tokenizer import MyTokenizer
+from .global_variables import (BILL_DATA_FILEPATH,
+                               DATABASE_VECTORS_FILEPATH,
+                               T2_VECTORIZER_FILEPATH,
+                               ORDINAL_2_ID_DICT_FILEPATH)
 
 
 class BillSearcher(object):

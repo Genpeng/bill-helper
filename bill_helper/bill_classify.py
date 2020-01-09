@@ -9,7 +9,7 @@ Author: Genpeng Xu
 from typing import List, Union
 
 # Own customized modules
-from core.classifier import BillClassifier
+from .classifier import BillClassifier
 
 # global variables needed
 clf = BillClassifier()
