@@ -23,9 +23,7 @@ class BillClassifier(object):
         self._model = joblib.load(T1_MODEL_FILEPATH)
         self._label_2_type = joblib.load(LABEL_2_TYPE_DICT_FILEPATH)
 
-    def _classify(self, texts: Union[str, List[str]]) -> List[int]:
-        if isinstance(texts, str):
-            texts = [texts]
+    def _classify(self, texts: List[str]) -> List[int]:
         texts_segmented = [self._tokenizer.segment(text) for text in texts]
         return list(self._model.predict(self._vectorizer.transform(texts_segmented)))
 
