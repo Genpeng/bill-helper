@@ -37,7 +37,7 @@ INDEX_TIME_PARAMS = {
     "efConstruction": 100,
 }
 QUERY_TIME_PARAMS = {
-    "efSearch": 6000
+    "efSearch": 7000
 }
 
 if __name__ == '__main__':

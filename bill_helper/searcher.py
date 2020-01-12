@@ -19,8 +19,7 @@ from bill_helper.global_variables import (BILL_DATA_FILEPATH,
                                           DATABASE_VECTORS_FILEPATH,
                                           T2_VECTORIZER_FILEPATH,
                                           ORDINAL_2_ID_DICT_FILEPATH,
-                                          INDEX_TIME_PARAMS,
-                                          QUERY_TIME_PARAMS)
+                                          INDEX_TIME_PARAMS)
 
 
 class FaissBillSearcher(object):
@@ -105,7 +104,7 @@ class NmslibBillSearcher(object):
         self._index = nmslib.init(method="hnsw", space="l2", data_type=nmslib.DataType.DENSE_VECTOR)
         self._index.addDataPointBatch(self._db_vects)
         self._index.createIndex(INDEX_TIME_PARAMS)
-        self._index.setQueryTimeParams(QUERY_TIME_PARAMS)
+        self._index.setQueryTimeParams({"efSearch": self._d})
 
     def _generate_text_dataframe(self) -> pd.DataFrame:
         feature_cols = ['bill_name', 'bill_desc', 'unit']
