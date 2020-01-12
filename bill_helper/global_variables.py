@@ -30,6 +30,16 @@ DATABASE_VECTORS_FILEPATH = os.path.join(T2_DATA_DIR, 'database_vectors.joblib')
 ORDINAL_2_ID_DICT_FILEPATH = os.path.join(T2_DATA_DIR, 'ordinal_2_id.dict')
 T2_VECTORIZER_FILEPATH = os.path.join(T2_DATA_DIR, 'vectorizer.joblib')
 
+# nmslib bill searcher configuration
+INDEX_TIME_PARAMS = {
+    "M": 15,
+    "indexThreadQty": 4,
+    "efConstruction": 100,
+}
+QUERY_TIME_PARAMS = {
+    "efSearch": 6000
+}
+
 if __name__ == '__main__':
     print(ROOT_DIR)
 

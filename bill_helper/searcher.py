@@ -7,20 +7,23 @@ Author: Genpeng Xu
 """
 
 import faiss
+import nmslib
 import joblib
 import numpy as np
 import pandas as pd
-from typing import Union, List, Tuple
+from typing import List, Tuple
 
 # Own customized variables
 from bill_helper.tokenizer import MyTokenizer
 from bill_helper.global_variables import (BILL_DATA_FILEPATH,
                                           DATABASE_VECTORS_FILEPATH,
                                           T2_VECTORIZER_FILEPATH,
-                                          ORDINAL_2_ID_DICT_FILEPATH)
+                                          ORDINAL_2_ID_DICT_FILEPATH,
+                                          INDEX_TIME_PARAMS,
+                                          QUERY_TIME_PARAMS)
 
 
-class BillSearcher(object):
+class FaissBillSearcher(object):
     def __init__(self) -> None:
         self._db_df = pd.read_csv(BILL_DATA_FILEPATH)
         self._db_vects = joblib.load(DATABASE_VECTORS_FILEPATH).toarray().astype('float32')
@@ -90,6 +93,57 @@ class BillSearcher(object):
         return self._d
 
 
+class NmslibBillSearcher(object):
+    def __init__(self) -> None:
+        self._db_df = pd.read_csv(BILL_DATA_FILEPATH)
+        self._db_vects = joblib.load(DATABASE_VECTORS_FILEPATH).toarray().astype('float32')
+        self._texts_df = self._generate_text_dataframe()
+        self._tokenizer = MyTokenizer()
+        self._vectorizer = joblib.load(T2_VECTORIZER_FILEPATH)
+        self._ordinal_2_id = joblib.load(ORDINAL_2_ID_DICT_FILEPATH)
+        self._d = self._db_vects.shape[1]
+        self._index = nmslib.init(method="hnsw", space="l2", data_type=nmslib.DataType.DENSE_VECTOR)
+        self._index.addDataPointBatch(self._db_vects)
+        self._index.createIndex(INDEX_TIME_PARAMS)
+        self._index.setQueryTimeParams(QUERY_TIME_PARAMS)
+
+    def _generate_text_dataframe(self) -> pd.DataFrame:
+        feature_cols = ['bill_name', 'bill_desc', 'unit']
+        texts_df = self._db_df.copy()
+        texts_df['bill_text'] = texts_df[feature_cols[0]].str.cat(
+            texts_df[feature_cols[1:]], sep=' '
+        )
+        texts_df.drop(columns=feature_cols, inplace=True)
+        return texts_df
+
+    def find_k_nearest_bills(self, query_texts: List[str], k: int = 5, num_threads: int = 4) -> List[pd.DataFrame]:
+        text_segmented = [self._tokenizer.segment(text) for text in query_texts]
+        query_vects = self._vectorizer.transform(text_segmented).toarray().astype('float32')
+        nbrs = self._index.knnQueryBatch(query_vects, k, num_threads)
+        results = []
+        for i, text in enumerate(query_texts):
+            ordinals, distances = nbrs[i]
+            distances = list(distances)
+            ids = [self._ordinal_2_id[ordinal] for ordinal in ordinals]
+            k_nearest_bills = pd.DataFrame()
+            if text in self._texts_df.bill_text.unique():
+                bill_id = int(self._db_df.loc[self._texts_df.bill_text == text].bill_id)
+                distances = [0] + distances
+                k_nearest_bills = pd.concat([k_nearest_bills, self._db_df.loc[self._db_df.bill_id == bill_id]], axis=0)
+            for _id in ids:
+                k_nearest_bills = pd.concat([k_nearest_bills, self._db_df.loc[self._db_df.bill_id == _id]], axis=0)
+            k_nearest_bills['distance'] = distances
+            k_nearest_bills.drop_duplicates(['bill_name', 'bill_desc', 'unit'], keep='first', inplace=True)
+            k_nearest_bills = k_nearest_bills.iloc[:k]
+            assert len(k_nearest_bills) == k
+            results.append(k_nearest_bills)
+        return results
+
+    @property
+    def d(self):
+        return self._d
+
+
 if __name__ == "__main__":
     query_texts = [
         "空心砖墙 1、砖品种、规格、强度等级：蒸压加气混凝土砌块 2、砂浆强度等级：M5水泥石灰砂浆 3、墙体厚度：200厚砖内墙 m3",  # index 0
@@ -97,6 +151,6 @@ if __name__ == "__main__":
         "木质防火门 1、木质乙级防火门 2、门窗五金及油漆 3、详见门窗大样 m2",  # index 57
         "配电箱 1、 配电箱安装 AW1~7 台",  # index 68
     ]
-    searcher = BillSearcher()
+    searcher = NmslibBillSearcher()
     results = searcher.find_k_nearest_bills(query_texts, 5)
     print(results[0])

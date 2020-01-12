@@ -10,10 +10,10 @@ import pandas as pd
 from typing import Union, List
 
 # Own customized modules
-from bill_helper.searcher import BillSearcher
+from bill_helper.searcher import FaissBillSearcher
 
 # global variables needed
-searcher = BillSearcher()
+searcher = FaissBillSearcher()
 
 
 def find_k_nearest_texts(query_texts: Union[str, List[str]], k: int = 5) -> Union[List[tuple], List[List[tuple]]]:
