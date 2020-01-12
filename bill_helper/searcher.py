@@ -47,7 +47,7 @@ class BillSearcher(object):
         D, I = self._index.search(query_vects, k)
         return D, I
 
-    def _find_k_nearest_texts(self, query_texts: List[str], k: int = 5) -> List[List[tuple]]:
+    def find_k_nearest_texts(self, query_texts: List[str], k: int = 5) -> List[List[tuple]]:
         _, I = self._find_k_nearest_indexes(query_texts, k)
         ans = []
         for text, ordinals in zip(query_texts, I):
@@ -59,35 +59,31 @@ class BillSearcher(object):
             ans.append(k_nearest_texts)
         return ans
 
-    def find_k_nearest_texts(self, query_texts: Union[str, List[str]], k: int = 5) -> List[List[tuple]]:
-        if isinstance(query_texts, str):
-            query_texts = [query_texts]
-        return self._find_k_nearest_texts(query_texts, k)
-
-    def _find_k_nearest_bills(self, query_texts: List[str], k: int = 5) -> List[pd.DataFrame]:
+    def find_k_nearest_bills(self, query_texts: List[str], k: int = 5) -> List[pd.DataFrame]:
         D, I = self._find_k_nearest_indexes(query_texts, k)
         results = []
         for i, text in enumerate(query_texts):
             ordinals, distances = I[i], list(D[i])
             ids = [self._ordinal_2_id[ordinal] for ordinal in ordinals]
-            res = pd.DataFrame()
+            k_nearest_bills = pd.DataFrame()
             if text in self._texts_df.bill_text.unique():
                 bill_id = int(self._db_df.loc[self._texts_df.bill_text == text].bill_id)
                 distances = [0] + distances
-                res = pd.concat([res, self._db_df.loc[self._texts_df.bill_id == bill_id]], axis=0)
+                k_nearest_bills = pd.concat(
+                    [k_nearest_bills, self._db_df.loc[self._db_df.bill_id == bill_id]],
+                    axis=0
+                )
             for _id in ids:
-                res = pd.concat([res, self._db_df.loc[self._db_df.bill_id == _id]], axis=0)
-            res['distance'] = distances
-            res.drop_duplicates(['bill_name', 'bill_desc', 'unit'], keep='first', inplace=True)
-            res = res.iloc[:k]
-            assert len(res) == k
-            results.append(res)
+                k_nearest_bills = pd.concat(
+                    [k_nearest_bills, self._db_df.loc[self._db_df.bill_id == _id]],
+                    axis=0
+                )
+            k_nearest_bills['distance'] = distances
+            k_nearest_bills.drop_duplicates(['bill_name', 'bill_desc', 'unit'], keep='first', inplace=True)
+            k_nearest_bills = k_nearest_bills.iloc[:k]
+            assert len(k_nearest_bills) == k
+            results.append(k_nearest_bills)
         return results
-
-    def find_k_nearest_bills(self, query_texts: Union[str, List[str]], k: int = 5) -> List[pd.DataFrame]:
-        if isinstance(query_texts, str):
-            query_texts = [query_texts]
-        return self._find_k_nearest_bills(query_texts, k)
 
     @property
     def d(self):
